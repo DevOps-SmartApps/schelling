@@ -20,6 +20,6 @@ A list containing two elements named house and rsim, storing the updated informa
 }
 \description{
 Relocate agents to a random empty location with similarity ratio greater than or equal to the similarity threshold t.
-If no empty locations satisfy the agent's requirement, move the agent to the empty location 
+If no empty locations satisfy the agent's requirement, move the agent to the empty location
 with the maximum value of r_sim.
 }

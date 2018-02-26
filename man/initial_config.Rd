@@ -24,7 +24,7 @@ A list containing two elements named house and rsim. house is a nr x nc matrix s
 Set up the initial configuration by randomly assigning houses to agents.
 }
 \examples{
-nr <- 50; nc <- 50; g <- 4 
+nr <- 50; nc <- 50; g <- 4
 fg <- c(1,1,1,1)  # equal number of agents in all 4 groups
 g_color <- c("red","blue","green","gold")
 set.seed(8326454)
