@@ -389,7 +389,7 @@ relocate <- function(config,nr,nc,t,r) {
 ```
 </div>
 
-###update(initial,n_agent,nr,nc,t,r,max_iter=10000L,anim_step=20000L,sleep_time=0)
+###update_config(initial,n_agent,nr,nc,t,r,max_iter=10000L,anim_step=20000L,sleep_time=0)
 
 *Purpose*: Control the update of configuration and show animation.
 
@@ -408,7 +408,7 @@ relocate <- function(config,nr,nc,t,r) {
 
 <div class="fold s">
 ```{r}
-update <- function(initial,n_agent,nr,nc,t,r, max_iter=10000L, 
+update_config <- function(initial,n_agent,nr,nc,t,r, max_iter=10000L, 
                    anim_step=20000L, sleep_time=0) {
   # calculate the mean similarity ratio
   rsim_avg <- sum(initial$rsim)/n_agent
@@ -462,7 +462,7 @@ In this model, no agents move in and out of the city. As a result, the number of
 
 Checking invariants proved to be helpful for the code development. There was a bug in the `relocate()` function. This bug caused the violation of invariants in the numerical result. I was able to use this clue to quickly track down the bug and fixed the problem. 
 
-With the bug removed, the code can now pass the invariant checks. Consider the following example with `g`=4 (four groups). First set up the initial configuration. Next call `update()` with 10 iterations and finally check the invariant quantities.
+With the bug removed, the code can now pass the invariant checks. Consider the following example with `g`=4 (four groups). First set up the initial configuration. Next call `update_config()` with 10 iterations and finally check the invariant quantities.
 
 ```{r}
 ### Check invariants ###
@@ -499,8 +499,8 @@ n_white
 # Consistency check: these numbers should sum up to 50x50=2500
 sum(ng) + n_white
 
-# Run update() for 10 iterations
-final <- update(initial,n_agent,nr,nc,t,r,10)
+# Run update_config() for 10 iterations
+final <- update_config(initial,n_agent,nr,nc,t,r,10)
 
 # Recalculate the invariant quantities
 ng_final <- sapply(g_color,function(c) { sum(final$house==c)})
@@ -548,9 +548,9 @@ n_agent <- N - n_white
 t <- c(0,0.1,0.2,0.3,0.4,0.5,0.6,0.7)
 rsim_t <- NULL
 for (i in seq_along(t)) {
-  # Run update() with max_iter set to 500 as in the other code
+  # Run update_config() with max_iter set to 500 as in the other code
   set.seed(2816783)
-  final <- update(initial,n_agent,nr,nc,t[i],r,500) 
+  final <- update_config(initial,n_agent,nr,nc,t[i],r,500) 
   # extract the mean similarity ratio of the final configuration,
   # which is the last element of final$rsim_avg
   rsim_t[i] <- with(final, rsim_avg[length(rsim_avg)])
@@ -577,7 +577,7 @@ The two groups of agents are represented by the colors red and blue.
 
 First consider the original Schelling model ($r=0$). After randomly assigning the agents to the grid, the dissatisfied agents are relocated until a static equilibrium is reached. The similarity threshold $t$ is varied between 0 to 0.9. Note that since each agent has at most 8 neighbors, the maximum possible value of the similarity ratio is 1 and the second maximum possible value of $r_{\rm sim}$ is 7/8 or 0.875. So setting $t>0.875$ is the same as demanding all of the agent's neighbors to be in the same group. 
 
-In the following code, the equilibrium configurations for $t$=0, 0.1, 0.2, ..., 0.9 are computed by calling the `update()` function and the final configurations are stored in the list `final`. The mean similarity ratios of the final configuration, $\bar{r}_{\rm sim}$, are also computed for each $t$ and are stored in a numeric vector `rsim_t`. Depending on your computer speed, the code may take several minutes to run. 
+In the following code, the equilibrium configurations for $t$=0, 0.1, 0.2, ..., 0.9 are computed by calling the `update_config()` function and the final configurations are stored in the list `final`. The mean similarity ratios of the final configuration, $\bar{r}_{\rm sim}$, are also computed for each $t$ and are stored in a numeric vector `rsim_t`. Depending on your computer speed, the code may take several minutes to run. 
 
 ```{r, eval=FALSE}
 # Set up the parameters
@@ -605,9 +605,9 @@ t <- c(0,seq(0.05,0.9,0.05))
 rsim_t <- NULL
 final <- list()
 for (i in seq_along(t)) {
-  # Run update() with max_iter set to 500
+  # Run update_config() with max_iter set to 500
   set.seed(2816783)
-  final[[i]] <- update(initial,n_agent,nr,nc,t[i],r,500) 
+  final[[i]] <- update_config(initial,n_agent,nr,nc,t[i],r,500) 
   # extract the mean similarity ratio of the final configuration,
   # which is the last element of final[[i]]$rsim_avg
   rsim_t[i] <- with(final[[i]], rsim_avg[length(rsim_avg)])
@@ -633,7 +633,7 @@ The following shows a table of the final mean similarity ratio vs $t$.
 names(rsim_t) <- paste("t =",t)
 rsim_t
 ```
-Note that when $t=0$, the agents don't care who their neighbors are and so no one moves. Hence, the final configuration is the same as the initial configuration. The mean similarity ratio of the initial configuration is `rsim_t[1]` or `r round(rsim_t[1],2)`. The case for $t=0.05$ and $t=0.1$ are practically the same as the $t=0$ case. Since each agent can have at most 8 neighbors, the second lowest value of the similarity ratio for each agent is 1/8 or 0.125. Therefore, both $t=0.05$ and $t=0.1$ means the same thing: each agent wants at least one neighbor to be like him. The table shows that the values of $\bar{r}_{\rm sim}$ for $t=0.05$ and $t=0.1$ are exactly the same. This is expected because the command `set.seed(2816783)` is used before running `update()` in each case. 
+Note that when $t=0$, the agents don't care who their neighbors are and so no one moves. Hence, the final configuration is the same as the initial configuration. The mean similarity ratio of the initial configuration is `rsim_t[1]` or `r round(rsim_t[1],2)`. The case for $t=0.05$ and $t=0.1$ are practically the same as the $t=0$ case. Since each agent can have at most 8 neighbors, the second lowest value of the similarity ratio for each agent is 1/8 or 0.125. Therefore, both $t=0.05$ and $t=0.1$ means the same thing: each agent wants at least one neighbor to be like him. The table shows that the values of $\bar{r}_{\rm sim}$ for $t=0.05$ and $t=0.1$ are exactly the same. This is expected because the command `set.seed(2816783)` is used before running `update_config()` in each case. 
 
 The plot and table show that a relatively high degree of segregation occurs even for moderate values of $t$, consistent with Schelling's finding in the 1970s. For example, $\bar{r}_{\rm sim}=0.74$ for $t=0.3$. The total segregation ($\bar{r}_{\rm sim}=1$) occurs when $t \geq 0.85$.
 
@@ -683,9 +683,9 @@ n_agent <- N - n_white
 t <- c(0,seq(0.05,0.9,0.05))
 final <- list()
 for (i in seq_along(t)) {
-  # Run update() with max_iter set to 10000 (the default value)
+  # Run update_config() with max_iter set to 10000 (the default value)
   set.seed(2816783)
-  final[[i]] <- update(initial,n_agent,nr,nc,t[i],r) 
+  final[[i]] <- update_config(initial,n_agent,nr,nc,t[i],r) 
 }
 names(final) <- paste("t =",t)
 ```
@@ -789,9 +789,9 @@ t <- c(0,seq(0.05,0.9,0.05))
 rsim_t <- NULL
 final <- list()
 for (i in seq_along(t)) {
-  # Run update() with max_iter set to 500
+  # Run update_config() with max_iter set to 500
   set.seed(2816783)
-  final[[i]] <- update(initial,n_agent,nr,nc,t[i],r,500) 
+  final[[i]] <- update_config(initial,n_agent,nr,nc,t[i],r,500) 
   # extract the mean similarity ratio of the final configuration,
   # which is the last element of final[[i]]$rsim_avg
   rsim_t[i] <- with(final[[i]], rsim_avg[length(rsim_avg)])
@@ -861,9 +861,9 @@ n_agent <- N - n_white
 t <- c(0,seq(0.05,0.9,0.05))
 final <- list()
 for (i in seq_along(t)) {
-  # Run update() with max_iter set to 10000 (the default value)
+  # Run update_config() with max_iter set to 10000 (the default value)
   set.seed(2816783)
-  final[[i]] <- update(initial,n_agent,nr,nc,t[i],r) 
+  final[[i]] <- update_config(initial,n_agent,nr,nc,t[i],r) 
 }
 names(final) <- paste("t =",t)
 ```
@@ -929,9 +929,9 @@ abline(v=1:(nc+1), h=1:(nr+1))
 
 #Animation
 
-The nice thing about the code is that you can watch the development of segregation during the simulation. In R, there are packages you can download to create animations. However, I find that it is easier to introduce two parameters in the `update()` function to show a simple animation for this particular model. The two parameters are named `anim_step` and `sleep_time` in the `update()` function. 
+The nice thing about the code is that you can watch the development of segregation during the simulation. In R, there are packages you can download to create animations. However, I find that it is easier to introduce two parameters in the `update_config()` function to show a simple animation for this particular model. The two parameters are named `anim_step` and `sleep_time` in the `update_config()` function. 
 
-The parameter `anim_step` tells the `update()` function to plot the configuration every `anim_step` iteration. I find that setting `anim_step` to 5 or 10 works well in my home computer. For example, the following code shows the animation for the case `g`=2, $t=0.15$ and $r=0.05$.
+The parameter `anim_step` tells the `update_config()` function to plot the configuration every `anim_step` iteration. I find that setting `anim_step` to 5 or 10 works well in my home computer. For example, the following code shows the animation for the case `g`=2, $t=0.15$ and $r=0.05$.
 ```{r, eval=FALSE}
 # Set up the parameters
 nr <- 50
@@ -954,13 +954,13 @@ names(ng) <- g_color
 n_white <- sum(initial$house=="white")
 n_agent <- N - n_white
 
-# Run update() with max_iter set to 10000 (the default value), set anim_step=10
+# Run update_config() with max_iter set to 10000 (the default value), set anim_step=10
 set.seed(2816783)
-final <- update(initial,n_agent,nr,nc,t,r, anim_step=10) 
+final <- update_config(initial,n_agent,nr,nc,t,r, anim_step=10) 
 ```
 I suggest running the code in RStudio. Adjust the size of the Plot panel of your R studio to make the plot display nicely there. Also adjust the parameter `anim_step` to control the frequency of the update of the map. If you set the value of `anim_step` too small (e.g. 1), R's graphics generation may not be able to keep up with the execution speed and you probably won't see anything. If you encounter this problem, either set a larger value of `anim_step` or use the parameter `sleep_time`, which tells R to pause the execution for `sleep_time` seconds. This allows time for R to generate the graphics. For example, if you replace the last line by the command 
 
-`final <- update(initial,n_agent,nr,nc,t,r, anim_step=1,sleep_time=0.8)`
+`final <- update_config(initial,n_agent,nr,nc,t,r, anim_step=1,sleep_time=0.8)`
 
 the plot will be updated every single iteration, but the execution will pause for 0.8 seconds after every iteration to allow time for the plot to be shown. This slows down the calculation and so is not recommended. Setting a larger value of `anim_step` is more desirable.
 

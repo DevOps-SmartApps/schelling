@@ -141,7 +141,7 @@ $(document).ready(function () {
 <li><a href="#compute_rsim_1pointm-ij-istartiend-jstartjend">compute_rsim_1point(m, i,j, istart,iend, jstart,jend)</a></li>
 <li><a href="#compute_rsimm-r_sim-nr-nc">compute_rsim(m, r_sim, nr, nc)</a></li>
 <li><a href="#relocateconfignrnctr">relocate(config,nr,nc,t,r)</a></li>
-<li><a href="#updateinitialn_agentnrnctrmax_iter10000lanim_step20000lsleep_time0">update(initial,n_agent,nr,nc,t,r,max_iter=10000L,anim_step=20000L,sleep_time=0)</a></li>
+<li><a href="#update_configinitialn_agentnrnctrmax_iter10000lanim_step20000lsleep_time0">update_config(initial,n_agent,nr,nc,t,r,max_iter=10000L,anim_step=20000L,sleep_time=0)</a></li>
 </ul></li>
 <li><a href="#code-test">Code Test</a><ul>
 <li><a href="#checking-invariants">Checking Invariants</a></li>
@@ -485,8 +485,8 @@ install_github(&quot;ytliu0/schelling&quot;)</code></pre>
 }</code></pre>
 </div>
 </div>
-<div id="updateinitialn_agentnrnctrmax_iter10000lanim_step20000lsleep_time0" class="section level3">
-<h3>update(initial,n_agent,nr,nc,t,r,max_iter=10000L,anim_step=20000L,sleep_time=0)</h3>
+<div id="update_configinitialn_agentnrnctrmax_iter10000lanim_step20000lsleep_time0" class="section level3">
+<h3>update_config(initial,n_agent,nr,nc,t,r,max_iter=10000L,anim_step=20000L,sleep_time=0)</h3>
 <p><em>Purpose</em>: Control the update of configuration and show animation.</p>
 <p><em>Input Parameters</em></p>
 <ul>
@@ -501,7 +501,7 @@ install_github(&quot;ytliu0/schelling&quot;)</code></pre>
 </ul>
 <p><em>Output</em>: A list with 3 elements — <code>house</code>, <code>rsim</code> and <code>rsim_avg</code>. <code>house</code> is a nr×nc matrix storing the occupation of houses in the final configuration; <code>rsim</code> is a nr×nc matrix storing the similarity ratio in the final configuration; <code>rsim_avg</code> is a numeric vector storing the mean similarity ratio in each iteration; the first element corresponds to iteration 0, the mean similarity ratio of the initial configuration.</p>
 <div class="fold s">
-<pre class="r"><code>update &lt;- function(initial,n_agent,nr,nc,t,r, max_iter=10000L, 
+<pre class="r"><code>update_config &lt;- function(initial,n_agent,nr,nc,t,r, max_iter=10000L, 
                    anim_step=20000L, sleep_time=0) {
   # calculate the mean similarity ratio
   rsim_avg &lt;- sum(initial$rsim)/n_agent
@@ -552,7 +552,7 @@ install_github(&quot;ytliu0/schelling&quot;)</code></pre>
 <h3>Checking Invariants</h3>
 <p>In this model, no agents move in and out of the city. As a result, the number of agents in each group remains unchanged. The number of unoccupied houses is also fixed. These are the invariants in the model.</p>
 <p>Checking invariants proved to be helpful for the code development. There was a bug in the <code>relocate()</code> function. This bug caused the violation of invariants in the numerical result. I was able to use this clue to quickly track down the bug and fixed the problem.</p>
-<p>With the bug removed, the code can now pass the invariant checks. Consider the following example with <code>g</code>=4 (four groups). First set up the initial configuration. Next call <code>update()</code> with 10 iterations and finally check the invariant quantities.</p>
+<p>With the bug removed, the code can now pass the invariant checks. Consider the following example with <code>g</code>=4 (four groups). First set up the initial configuration. Next call <code>update_config()</code> with 10 iterations and finally check the invariant quantities.</p>
 <pre class="r"><code>### Check invariants ###
 # define parameters
 nr &lt;- 50
@@ -589,8 +589,8 @@ n_white</code></pre>
 <pre class="r"><code># Consistency check: these numbers should sum up to 50x50=2500
 sum(ng) + n_white</code></pre>
 <pre><code>[1] 2500</code></pre>
-<pre class="r"><code># Run update() for 10 iterations
-final &lt;- update(initial,n_agent,nr,nc,t,r,10)
+<pre class="r"><code># Run update_config() for 10 iterations
+final &lt;- update_config(initial,n_agent,nr,nc,t,r,10)
 
 # Recalculate the invariant quantities
 ng_final &lt;- sapply(g_color,function(c) { sum(final$house==c)})
@@ -637,9 +637,9 @@ n_agent &lt;- N - n_white
 t &lt;- c(0,0.1,0.2,0.3,0.4,0.5,0.6,0.7)
 rsim_t &lt;- NULL
 for (i in seq_along(t)) {
-  # Run update() with max_iter set to 500 as in the other code
+  # Run update_config() with max_iter set to 500 as in the other code
   set.seed(2816783)
-  final &lt;- update(initial,n_agent,nr,nc,t[i],r,500) 
+  final &lt;- update_config(initial,n_agent,nr,nc,t[i],r,500) 
   # extract the mean similarity ratio of the final configuration,
   # which is the last element of final$rsim_avg
   rsim_t[i] &lt;- with(final, rsim_avg[length(rsim_avg)])
@@ -662,7 +662,7 @@ plot(t,rsim_t,xlab=&quot;Similarity Threshold&quot;,ylab=&quot;Mean Similarity R
 <div id="static-equilibrium-r0" class="section level3">
 <h3>Static Equilibrium (r=0)</h3>
 <p>First consider the original Schelling model (<span class="math inline">\(r=0\)</span>). After randomly assigning the agents to the grid, the dissatisfied agents are relocated until a static equilibrium is reached. The similarity threshold <span class="math inline">\(t\)</span> is varied between 0 to 0.9. Note that since each agent has at most 8 neighbors, the maximum possible value of the similarity ratio is 1 and the second maximum possible value of <span class="math inline">\(r_{\rm sim}\)</span> is 7/8 or 0.875. So setting <span class="math inline">\(t&gt;0.875\)</span> is the same as demanding all of the agent’s neighbors to be in the same group.</p>
-<p>In the following code, the equilibrium configurations for <span class="math inline">\(t\)</span>=0, 0.1, 0.2, …, 0.9 are computed by calling the <code>update()</code> function and the final configurations are stored in the list <code>final</code>. The mean similarity ratios of the final configuration, <span class="math inline">\(\bar{r}_{\rm sim}\)</span>, are also computed for each <span class="math inline">\(t\)</span> and are stored in a numeric vector <code>rsim_t</code>. Depending on your computer speed, the code may take several minutes to run.</p>
+<p>In the following code, the equilibrium configurations for <span class="math inline">\(t\)</span>=0, 0.1, 0.2, …, 0.9 are computed by calling the <code>update_config()</code> function and the final configurations are stored in the list <code>final</code>. The mean similarity ratios of the final configuration, <span class="math inline">\(\bar{r}_{\rm sim}\)</span>, are also computed for each <span class="math inline">\(t\)</span> and are stored in a numeric vector <code>rsim_t</code>. Depending on your computer speed, the code may take several minutes to run.</p>
 <pre class="r"><code># Set up the parameters
 nr &lt;- 50
 nc &lt;- 50
@@ -688,9 +688,9 @@ t &lt;- c(0,seq(0.05,0.9,0.05))
 rsim_t &lt;- NULL
 final &lt;- list()
 for (i in seq_along(t)) {
-  # Run update() with max_iter set to 500
+  # Run update_config() with max_iter set to 500
   set.seed(2816783)
-  final[[i]] &lt;- update(initial,n_agent,nr,nc,t[i],r,500) 
+  final[[i]] &lt;- update_config(initial,n_agent,nr,nc,t[i],r,500) 
   # extract the mean similarity ratio of the final configuration,
   # which is the last element of final[[i]]$rsim_avg
   rsim_t[i] &lt;- with(final[[i]], rsim_avg[length(rsim_avg)])
@@ -709,7 +709,7 @@ rsim_t</code></pre>
 0.7738683 0.8153185 0.8604661 0.8604661 0.9245423 0.9648698 0.9532582 
   t = 0.7  t = 0.75   t = 0.8  t = 0.85   t = 0.9 
 0.9848667 0.9850370 0.9850370 1.0000000 1.0000000 </code></pre>
-<p>Note that when <span class="math inline">\(t=0\)</span>, the agents don’t care who their neighbors are and so no one moves. Hence, the final configuration is the same as the initial configuration. The mean similarity ratio of the initial configuration is <code>rsim_t[1]</code> or 0.49. The case for <span class="math inline">\(t=0.05\)</span> and <span class="math inline">\(t=0.1\)</span> are practically the same as the <span class="math inline">\(t=0\)</span> case. Since each agent can have at most 8 neighbors, the second lowest value of the similarity ratio for each agent is 1/8 or 0.125. Therefore, both <span class="math inline">\(t=0.05\)</span> and <span class="math inline">\(t=0.1\)</span> means the same thing: each agent wants at least one neighbor to be like him. The table shows that the values of <span class="math inline">\(\bar{r}_{\rm sim}\)</span> for <span class="math inline">\(t=0.05\)</span> and <span class="math inline">\(t=0.1\)</span> are exactly the same. This is expected because the command <code>set.seed(2816783)</code> is used before running <code>update()</code> in each case.</p>
+<p>Note that when <span class="math inline">\(t=0\)</span>, the agents don’t care who their neighbors are and so no one moves. Hence, the final configuration is the same as the initial configuration. The mean similarity ratio of the initial configuration is <code>rsim_t[1]</code> or 0.49. The case for <span class="math inline">\(t=0.05\)</span> and <span class="math inline">\(t=0.1\)</span> are practically the same as the <span class="math inline">\(t=0\)</span> case. Since each agent can have at most 8 neighbors, the second lowest value of the similarity ratio for each agent is 1/8 or 0.125. Therefore, both <span class="math inline">\(t=0.05\)</span> and <span class="math inline">\(t=0.1\)</span> means the same thing: each agent wants at least one neighbor to be like him. The table shows that the values of <span class="math inline">\(\bar{r}_{\rm sim}\)</span> for <span class="math inline">\(t=0.05\)</span> and <span class="math inline">\(t=0.1\)</span> are exactly the same. This is expected because the command <code>set.seed(2816783)</code> is used before running <code>update_config()</code> in each case.</p>
 <p>The plot and table show that a relatively high degree of segregation occurs even for moderate values of <span class="math inline">\(t\)</span>, consistent with Schelling’s finding in the 1970s. For example, <span class="math inline">\(\bar{r}_{\rm sim}=0.74\)</span> for <span class="math inline">\(t=0.3\)</span>. The total segregation (<span class="math inline">\(\bar{r}_{\rm sim}=1\)</span>) occurs when <span class="math inline">\(t \geq 0.85\)</span>.</p>
 <p>The following plots show the final configuration for several values of <span class="math inline">\(t\)</span>.</p>
 <pre class="r"><code>x &lt;- rep(1:nr,nc)+0.5
@@ -755,9 +755,9 @@ n_agent &lt;- N - n_white
 t &lt;- c(0,seq(0.05,0.9,0.05))
 final &lt;- list()
 for (i in seq_along(t)) {
-  # Run update() with max_iter set to 10000 (the default value)
+  # Run update_config() with max_iter set to 10000 (the default value)
   set.seed(2816783)
-  final[[i]] &lt;- update(initial,n_agent,nr,nc,t[i],r) 
+  final[[i]] &lt;- update_config(initial,n_agent,nr,nc,t[i],r) 
 }
 names(final) &lt;- paste(&quot;t =&quot;,t)</code></pre>
 <p>First look at the case <span class="math inline">\(t=0.05\)</span> and <span class="math inline">\(t=0.1\)</span>. As explained above, these two cases are identical. The mean similarity ratio <span class="math inline">\(\bar{r}_{\rm sim}\)</span> in each iteration for <span class="math inline">\(t=0.1\)</span> is stored in the numeric vector <code>final[[&quot;t = 0.1&quot;]]$rsim_avg</code>. The first element corresponds to iteration 0, the initial configuration. The following is a plot showing <span class="math inline">\(\bar{r}_{\rm sim}\)</span> versus iteration.</p>
@@ -848,9 +848,9 @@ t &lt;- c(0,seq(0.05,0.9,0.05))
 rsim_t &lt;- NULL
 final &lt;- list()
 for (i in seq_along(t)) {
-  # Run update() with max_iter set to 500
+  # Run update_config() with max_iter set to 500
   set.seed(2816783)
-  final[[i]] &lt;- update(initial,n_agent,nr,nc,t[i],r,500) 
+  final[[i]] &lt;- update_config(initial,n_agent,nr,nc,t[i],r,500) 
   # extract the mean similarity ratio of the final configuration,
   # which is the last element of final[[i]]$rsim_avg
   rsim_t[i] &lt;- with(final[[i]], rsim_avg[length(rsim_avg)])
@@ -918,9 +918,9 @@ n_agent &lt;- N - n_white
 t &lt;- c(0,seq(0.05,0.9,0.05))
 final &lt;- list()
 for (i in seq_along(t)) {
-  # Run update() with max_iter set to 10000 (the default value)
+  # Run update_config() with max_iter set to 10000 (the default value)
   set.seed(2816783)
-  final[[i]] &lt;- update(initial,n_agent,nr,nc,t[i],r) 
+  final[[i]] &lt;- update_config(initial,n_agent,nr,nc,t[i],r) 
 }
 names(final) &lt;- paste(&quot;t =&quot;,t)</code></pre>
 </div>
@@ -985,8 +985,8 @@ abline(v=1:(nc+1), h=1:(nr+1))</code></pre>
 </div>
 <div id="animation" class="section level1">
 <h1>Animation</h1>
-<p>The nice thing about the code is that you can watch the development of segregation during the simulation. In R, there are packages you can download to create animations. However, I find that it is easier to introduce two parameters in the <code>update()</code> function to show a simple animation for this particular model. The two parameters are named <code>anim_step</code> and <code>sleep_time</code> in the <code>update()</code> function.</p>
-<p>The parameter <code>anim_step</code> tells the <code>update()</code> function to plot the configuration every <code>anim_step</code> iteration. I find that setting <code>anim_step</code> to 5 or 10 works well in my home computer. For example, the following code shows the animation for the case <code>g</code>=2, <span class="math inline">\(t=0.15\)</span> and <span class="math inline">\(r=0.05\)</span>.</p>
+<p>The nice thing about the code is that you can watch the development of segregation during the simulation. In R, there are packages you can download to create animations. However, I find that it is easier to introduce two parameters in the <code>update_config()</code> function to show a simple animation for this particular model. The two parameters are named <code>anim_step</code> and <code>sleep_time</code> in the <code>update_config()</code> function.</p>
+<p>The parameter <code>anim_step</code> tells the <code>update_config()</code> function to plot the configuration every <code>anim_step</code> iteration. I find that setting <code>anim_step</code> to 5 or 10 works well in my home computer. For example, the following code shows the animation for the case <code>g</code>=2, <span class="math inline">\(t=0.15\)</span> and <span class="math inline">\(r=0.05\)</span>.</p>
 <pre class="r"><code># Set up the parameters
 nr &lt;- 50
 nc &lt;- 50
@@ -1008,11 +1008,11 @@ names(ng) &lt;- g_color
 n_white &lt;- sum(initial$house==&quot;white&quot;)
 n_agent &lt;- N - n_white
 
-# Run update() with max_iter set to 10000 (the default value), set anim_step=10
+# Run update_config() with max_iter set to 10000 (the default value), set anim_step=10
 set.seed(2816783)
-final &lt;- update(initial,n_agent,nr,nc,t,r, anim_step=10) </code></pre>
+final &lt;- update_config(initial,n_agent,nr,nc,t,r, anim_step=10) </code></pre>
 <p>I suggest running the code in RStudio. Adjust the size of the Plot panel of your R studio to make the plot display nicely there. Also adjust the parameter <code>anim_step</code> to control the frequency of the update of the map. If you set the value of <code>anim_step</code> too small (e.g. 1), R’s graphics generation may not be able to keep up with the execution speed and you probably won’t see anything. If you encounter this problem, either set a larger value of <code>anim_step</code> or use the parameter <code>sleep_time</code>, which tells R to pause the execution for <code>sleep_time</code> seconds. This allows time for R to generate the graphics. For example, if you replace the last line by the command</p>
-<p><code>final &lt;- update(initial,n_agent,nr,nc,t,r, anim_step=1,sleep_time=0.8)</code></p>
+<p><code>final &lt;- update_config(initial,n_agent,nr,nc,t,r, anim_step=1,sleep_time=0.8)</code></p>
 <p>the plot will be updated every single iteration, but the execution will pause for 0.8 seconds after every iteration to allow time for the plot to be shown. This slows down the calculation and so is not recommended. Setting a larger value of <code>anim_step</code> is more desirable.</p>
 </div>
 <div id="questions-to-consider" class="section level1">
