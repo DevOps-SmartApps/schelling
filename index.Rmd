@@ -149,7 +149,7 @@ The introduction of this new agent behavior increases the mobility of agents. Yo
 
 The following five functions are defined for simulating the Schelling model. Click <span style="background-color:#004c93; color:white;">Show Source</span> to see the code.
 
-Note: To make things simple, I have created an R package containing all these functions. You can install the package using the following commands.
+To make things simple, I created an R package containing all these functions. You can install the package using the following commands.
 ```{r, eval=FALSE}
 if (!require(devtools)) {
   install.packages("devtools")
