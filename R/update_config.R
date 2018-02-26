@@ -18,9 +18,9 @@
 #' # set up initial configuration
 #' set.seed(8326454)
 #' initial <- initial_config(nr,nc,f_white, g,fg,g_color)
-#' # Run update() for 10 iterations
-#' final <- update(initial,n_agent,nr,nc,t,r,10)
-update <- function(initial,n_agent,nr,nc,t,r, max_iter=10000L,
+#' # Run update_config() for 10 iterations
+#' final <- update_config(initial,n_agent,nr,nc,t,r,10)
+update_config <- function(initial,n_agent,nr,nc,t,r, max_iter=10000L,
                    anim_step=20000L, sleep_time=0) {
   # calculate the mean similarity ratio
   rsim_avg <- sum(initial$rsim)/n_agent
