@@ -3,7 +3,7 @@ Title: Simulating the Schelling Model
 Version: 0.0.0.9000
 Authors@R: person("Yuk Tung", "Liu", email = "yuktungliu@gmail.com", role = c("aut", "cre"))
 Description: This package contains the functions for the simulation of the Schelling model of segregation described on https://ytliu0.github.io/schelling
-Depends: R (>= 3.3.3)
+Depends: R (>= 3.3.2)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
