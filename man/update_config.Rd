@@ -37,6 +37,12 @@ t <- 0.15; r <- 0.05
 # set up initial configuration
 set.seed(8326454)
 initial <- initial_config(nr,nc,f_white, g,fg,g_color)
+n_white <- sum(initial$house=="white") # number of empty houses
+n_agent <- N - n_white #number of agents
 # Run update_config() for 10 iterations
 final <- update_config(initial,n_agent,nr,nc,t,r,10)
+# plot average simularity ratio vs iteration
+plot(0:10, final$rsim_avg, las=1, pch=16,
+       xlab="Iteration",
+       ylab="Average Simularity Ratio")
 }
