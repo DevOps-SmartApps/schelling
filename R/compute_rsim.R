@@ -3,6 +3,7 @@
 #' @param m a matrix of size nr x nc storing the occupation information of the house at each grid point.
 #' @param r_sim a matrix of size nr x nc storing the old similarity ratios at each grid point.
 #' @param nr,nc the rectangular grid size parameters.
+#' @return a matrix of size nr x nc storing the updated similarity ratios at each grid point.
 #' @export
 compute_rsim <- function(m, r_sim, nr, nc) {
   # The max() and min() functions are called to take care of boundary and corner points
