@@ -13,6 +13,9 @@ compute_rsim(m, r_sim, nr, nc)
 
 \item{nr, nc}{the rectangular grid size parameters.}
 }
+\value{
+a matrix of size nr x nc storing the updated similarity ratios at each grid point.
+}
 \description{
 Compute the similarity ratio at each grid point
 }

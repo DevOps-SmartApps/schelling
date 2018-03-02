@@ -11,8 +11,16 @@
 #' nr <- 50; nc <- 50; g <- 4
 #' fg <- c(1,1,1,1)  # equal number of agents in all 4 groups
 #' g_color <- c("red","blue","green","gold")
+#' f_white <- 0.1 # 10% of unoccupied houses
 #' set.seed(8326454)
 #' initial <- initial_config(nr,nc,f_white, g,fg,g_color)
+#' # plot the initial configuration
+#' x <- rep(1:nr,nc)+0.5
+#' y <- rep(1:nc,each=nr)+0.5
+#' plot(x,y, pch=16, col=as.character(initial$house),xlab="",ylab="",
+#'      xaxt='n',yaxt='n', xlim=c(2.8,nr-0.8), ylim=c(2.8,nc-0.8),
+#'      main="Initial Configuration")
+#' abline(v=1:(nc+1), h=1:(nr+1))
 initial_config <- function(nr,nc,f_white, g,fg,g_color) {
   N <- nr*nc # total number of houses
 
